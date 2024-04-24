@@ -43,13 +43,16 @@ in
       %            )
       fun {Next Spaceship Instruction}
          {Browse Instruction}
-         declare Positions Head Direction
-         Positions = Spaceship.positions %Extraire les positions du vaisseau
-         Head = Positions.1 %Extraire la tête de la queue Positions
-         Direction = Head.to %Direction à laquelle se dirige le vaisseau
-         {Browse Positions}
-         {Browse Head}
-         {Browse Direction}
+         local Positions Head Direction in
+            Positions = Spaceship.positions %Extraire les positions du vaisseau
+            Head = Positions.1 %Extraire la tête de la queue Positions
+            Direction = Head.to %Direction à laquelle se dirige le vaisseau
+            
+            case Instruction of
+            
+               forward then {Browse "Forward"} end
+
+         end
          Spaceship
       end
 
