@@ -1,7 +1,7 @@
 local 
    % Vous pouvez remplacer ce chemin par celui du dossier qui contient LethOzLib.ozf
 
-   Dossier = {Property.condGet cwdir '/Users/arthurlouette/Documents/Concepts des Langages de Programmation - LINFO1104/Projet/2024'}
+   Dossier = {Property.condGet cwdir '/Users/arthurlouette/Documents/Concepts des Langages de Programmation - LINFO1104/Projet/2024/LethOz'}
    LethOzLib
 
    % Les deux fonctions que vous devez implémenter
@@ -43,9 +43,14 @@ in
       %            )
       fun {Next Spaceship Instruction}
          {Browse Instruction}
-         case Instruction of
-            
-            Spaceship
+         declare Positions Head Direction
+         Positions = Spaceship.positions %Extraire les positions du vaisseau
+         Head = Positions.1 %Extraire la tête de la queue Positions
+         Direction = Head.to %Direction à laquelle se dirige le vaisseau
+         {Browse Positions}
+         {Browse Head}
+         {Browse Direction}
+         Spaceship
       end
 
       
