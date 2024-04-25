@@ -27,7 +27,8 @@ in
       % Déclarez vos functions ici
       X
       RemoveFirst
-      DecodeInstruction
+      FoldL
+      DecodeRepeat
    in
       % Fonction permettant d'enlever le premier élément d'une liste
       % qui nous servira dans le cas de la fonction Next, pour former
@@ -39,16 +40,15 @@ in
          end
       end
 
-      % Fonction qui nous permet de déchiffrer une instruction individuelle
-      fun {DecodeInstruction Instruction}
-         case Instruction of
-         forward then fun {$ Spaceship} {Next Spaceship forward} end
-         []turn(left) then fun {$ Spaceship} {Next Spaceship turn(left)} end
-         []turn(right) then  fun {$ Spaceship} {Next Spaceship turn(right)} end
+      % Fonction FoldL, qui pour rappel permet d'appliquer une fonction à chaque élément d'une liste
+      % que l'on va utiliser dans la fonction DecodeStrategy
+      fun {FoldL Fun Initial List}
+         case List of
+         nil then Initial
+         []X|Xs then
+            {FoldL Fun {Fun Initial X} Xs}
          end
       end
-
-
 
       % La fonction qui renvoit les nouveaux attributs du serpent après prise
       % en compte des effets qui l'affectent et de son instruction
@@ -127,33 +127,25 @@ in
       %            | repeat(<strategy> times:<integer>) '|' <strategy>
       %            | nil
       fun {DecodeStrategy Strategy}
-         %[
-            %fun{$ Spaceship} %Cette fonction renvoie juste le spaceship sans le modifier
-               %Spaceship
-            %end
-         %]
-
          case Strategy of
+            nil then nil % Si aucune instruction, retourne nil
+            [] then nil % Si la liste est vide, retourne nil
 
-         nil then nil
-         
-         []Instruction | RestStrategy then %Si la stratégie contient au moins une instruction
-         
-            case Instruction of
-
-            forward then % Si l'instruction est "forward"
-               % Créer une fonction qui appelle Next avec l'instruction "forward"
-               fun {$ Spaceship} {Next Spaceship forward} end | {DecodeStrategy RestStrategy}
+            [Instruction|Rest] then
             
-            []turn(Direction) then
-               fun {$ Spaceship} {Next Spaceship turn(Direction)} end | {DecodeStrategy RestStrategy}
-            
-            []repeat(SubStrategy times:Times) then %Si l'instruction est une répétition
-               % Appeler récursivement DecodeStrategy pour la sous-stratégie et répéter le résultat Times fois
-               nil
-            end
+               case Instruction of
+                  forward then % Si l'instruction est forward
+                     fun {$ Spaceship} {Next Spaceship forward} end | {DecodeStrategy Rest}
+                  [] turn(left) then % Si l'instruction est turn(left)
+                     fun {$ Spaceship} {Next Spaceship turn(left)} end | {DecodeStrategy Rest}
+                  [] turn(right) then % Si l'instruction est turn(right)
+                     fun {$ Spaceship} {Next Spaceship turn(right)} end | {DecodeStrategy Rest}
+                  [] repeat(InnerStrategy times:Times) then % Si l'instruction est repeat
+                     {List.replicate Times {DecodeStrategy InnerStrategy}} | {DecodeStrategy Rest}
+                  [] '|' then % Si la séparation est une barre verticale
+                     {DecodeStrategy Rest} % Ignorer la barre verticale et continuer avec le reste de la stratégie
+               end
          end
-
       end
 
       % Options
