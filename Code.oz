@@ -26,7 +26,21 @@ in
    local
       % Déclarez vos functions ici
       X
+      RemoveFirst
    in
+      % Fonction permettant d'enlever le premier élément d'une liste
+      % qui nous servira dans le cas de la fonction Next, pour former
+      % la nouvelle Queue NewPositions
+      fun {RemoveFirst L}
+         case L of
+         nil then nil
+         [] X|Xs then Xs
+         end
+      end
+
+
+
+
       % La fonction qui renvoit les nouveaux attributs du serpent après prise
       % en compte des effets qui l'affectent et de son instruction
       % 
@@ -41,18 +55,42 @@ in
       %               ]
       %               effects: [scrap|revert|wormhole(x:<P> y:<P>)|... ...]
       %            )
-      fun {Next Spaceship Instruction}
-         {Browse Instruction}
-         local Positions Head Direction in
-            Positions = Spaceship.positions %Extraire les positions du vaisseau
-            Head = Positions.1 %Extraire la tête de la queue Positions
-            Direction = Head.to %Direction à laquelle se dirige le vaisseau
-            
-            case Instruction of
-            
-               forward then {Browse "Forward"} end
+      fun {Next Spaceship Instruction} Positions Head Tail Direction in
 
+         {Browse Instruction}
+
+         Positions = Spaceship.positions %Extraire les positions du vaisseau, Positions est une Queue
+         Head = Positions.1 %Extraire la tête de la queue Positions
+         Tail = {RemoveFirst Positions} %Extraire le reste de la queue Position
+         Direction = Head.to %Direction à laquelle se dirige le vaisseau
+
+         case Instruction of
+
+         forward then NewHead NewPositions in %Si la direction est forward
+
+            NewHead = case Direction of
+
+            north then pos(x:Head.x y:Head.y-1 to:Direction)
+            []south then pos(x:Head.x y:Head.y+1 to:Direction)
+            []east then pos(x:Head.x+1 y:Head.y to:Direction)
+            []west then pos(x:Head.x-1 y:Head.y to:Direction)
+            end
+            
+
+            NewPositions = NewHead | Tail %NewPositions représente la nouvelle queue modifiée
+
+            spaceship(positions:NewPositions effects:Spaceship.effects)
+         
+
+         []turn(left) then
+            {Browse "Left"} 
+         
+
+         []turn(right) then 
+            {Browse "Right"}
+         
          end
+            
          Spaceship
       end
 
