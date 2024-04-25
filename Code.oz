@@ -7,7 +7,7 @@ local
    % Les deux fonctions que vous devez implémenter
    Next
    DecodeStrategy
-   
+
    % Hauteur et largeur de la grille
    % (1 <= x <= W=24, 1 <= y <= H=24)
    W = 24
@@ -27,6 +27,7 @@ in
       % Déclarez vos functions ici
       X
       RemoveFirst
+      DecodeInstruction
    in
       % Fonction permettant d'enlever le premier élément d'une liste
       % qui nous servira dans le cas de la fonction Next, pour former
@@ -38,6 +39,14 @@ in
          end
       end
 
+      % Fonction qui nous permet de déchiffrer une instruction individuelle
+      fun {DecodeInstruction Instruction}
+         case Instruction of
+         forward then fun {$ Spaceship} {Next Spaceship forward} end
+         []turn(left) then fun {$ Spaceship} {Next Spaceship turn(left)} end
+         []turn(right) then  fun {$ Spaceship} {Next Spaceship turn(right)} end
+         end
+      end
 
 
 
@@ -66,7 +75,7 @@ in
 
          case Instruction of
 
-         forward then NewHead NewPositions NewSpaceship in %Si la direction est forward
+         forward then NewHead NewPositions in %Si la direction est forward
 
             NewHead = case Direction of
             north then pos(x:Head.x y:Head.y-1 to:Direction)
@@ -118,11 +127,33 @@ in
       %            | repeat(<strategy> times:<integer>) '|' <strategy>
       %            | nil
       fun {DecodeStrategy Strategy}
-         [
-            fun{$ Spaceship}
-               Spaceship
+         %[
+            %fun{$ Spaceship} %Cette fonction renvoie juste le spaceship sans le modifier
+               %Spaceship
+            %end
+         %]
+
+         case Strategy of
+
+         nil then nil
+         
+         []Instruction | RestStrategy then %Si la stratégie contient au moins une instruction
+         
+            case Instruction of
+
+            forward then % Si l'instruction est "forward"
+               % Créer une fonction qui appelle Next avec l'instruction "forward"
+               fun {$ Spaceship} {Next Spaceship forward} end | {DecodeStrategy RestStrategy}
+            
+            []turn(Direction) then
+               fun {$ Spaceship} {Next Spaceship turn(Direction)} end | {DecodeStrategy RestStrategy}
+            
+            []repeat(SubStrategy times:Times) then %Si l'instruction est une répétition
+               % Appeler récursivement DecodeStrategy pour la sous-stratégie et répéter le résultat Times fois
+               nil
             end
-         ]
+         end
+
       end
 
       % Options
