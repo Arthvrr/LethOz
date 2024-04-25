@@ -66,32 +66,47 @@ in
 
          case Instruction of
 
-         forward then NewHead NewPositions in %Si la direction est forward
+         forward then NewHead NewPositions NewSpaceship in %Si la direction est forward
 
             NewHead = case Direction of
-
             north then pos(x:Head.x y:Head.y-1 to:Direction)
             []south then pos(x:Head.x y:Head.y+1 to:Direction)
             []east then pos(x:Head.x+1 y:Head.y to:Direction)
             []west then pos(x:Head.x-1 y:Head.y to:Direction)
             end
-            
 
             NewPositions = NewHead | Tail %NewPositions représente la nouvelle queue modifiée
 
-            spaceship(positions:NewPositions effects:Spaceship.effects)
-         
+            Spaceship(positions:NewPositions effects:Spaceship.effects) %On retourne le nouveau spaceship
 
-         []turn(left) then
-            {Browse "Left"} 
-         
-
-         []turn(right) then 
-            {Browse "Right"}
-         
-         end
+         []turn(left) then NewHead NewPositions in %Si la direction est left
             
-         Spaceship
+            NewHead = case Direction of
+            north then west
+            []south then east
+            []east then north
+            []west then south
+            end
+
+            NewPositions = NewHead | Tail %NewPositions représente la nouvelle queue modifiée
+            
+            Spaceship(positions:NewPositions effects:Spaceship.effects) %On retourne le nouveau spaceship
+
+         []turn(right) then NewHead NewPositions in %Si la direction est right
+
+            NewHead = case Direction of
+            north then east
+            []south then west
+            []east then south
+            []west then north
+            end
+
+            NewPositions = NewHead | Tail %NewPositions représente la nouvelle queue modifiée
+
+            Spaceship(positions:NewPositions effects:Spaceship.effects)
+      
+         end
+
       end
 
       
