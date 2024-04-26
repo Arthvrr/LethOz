@@ -7,7 +7,7 @@ local
    % Les deux fonctions que vous devez implémenter
    Next
    DecodeStrategy
-
+   
    % Hauteur et largeur de la grille
    % (1 <= x <= W=24, 1 <= y <= H=24)
    W = 24
@@ -28,7 +28,7 @@ in
       X
       RemoveFirst
       FoldL
-      DecodeRepeat
+      Replicate
    in
       % Fonction permettant d'enlever le premier élément d'une liste
       % qui nous servira dans le cas de la fonction Next, pour former
@@ -49,6 +49,19 @@ in
             {FoldL Fun {Fun Initial X} Xs}
          end
       end
+
+      % Fonction Replicate, qui permet de répliquer un élément donné un certain nombre de fois et retourner la liste
+      fun {Replicate Element Times}
+         case Times of
+         0 then nil %Si Times vaut 0, on retourne nil
+         []_ then Element | {Replicate Element Times-1} %On appelle récursivement Replicate en décrément de 1 Times
+         end
+      end
+
+
+
+
+
 
       % La fonction qui renvoit les nouveaux attributs du serpent après prise
       % en compte des effets qui l'affectent et de son instruction
@@ -86,6 +99,7 @@ in
 
             NewPositions = NewHead | Tail %NewPositions représente la nouvelle queue modifiée
 
+            %On retourne le nouveau Spaceship
             NewSpaceship(positions:NewPositions effects:Spaceship.effects strategy:Spaceship.strategy seismicCharge:Spaceship.seismicCharge)
 
          []turn(left) then NewHead NewPositions NewSpaceship in %Si la direction est left
@@ -99,6 +113,7 @@ in
 
             NewPositions = NewHead | Tail %NewPositions représente la nouvelle queue modifiée
 
+            %On retourne le nouveau Spaceship
             NewSpaceship(positions:NewPositions effects:Spaceship.effects strategy:Spaceship.strategy seismicCharge:Spaceship.seismicCharge)
 
          []turn(right) then NewHead NewPositions NewSpaceship in %Si la direction est right
@@ -112,6 +127,7 @@ in
 
             NewPositions = NewHead | Tail %NewPositions représente la nouvelle queue modifiée
 
+            %On retourne le nouveau Spaceship
             NewSpaceship(positions:NewPositions effects:Spaceship.effects strategy:Spaceship.strategy seismicCharge:Spaceship.seismicCharge)
       
          end
@@ -127,8 +143,47 @@ in
       %            | repeat(<strategy> times:<integer>) '|' <strategy>
       %            | nil
       fun {DecodeStrategy Strategy}
-         Strategy
+         case Strategy of
+         nil then nil %Si aucune instruction, retourne nil
+         []Instruction|Rest then
+      
+            case Instruction of
+      
+            forward then %Si l'instruction est forward
+               fun {$ Spaceship} {Next Spaceship forward} end | {DecodeStrategy Rest}
+
+            []turn(left) then %Si l'instruction est turn(left)
+               fun {$ Spaceship} {Next Spaceship turn(left)} end | {DecodeStrategy Rest}
+
+            []turn(right) then %Si l'instruction est turn(right)
+               fun {$ Spaceship} {Next Spaceship turn(right)} end | {DecodeStrategy Rest}
+
+            []repeat(InnerStrategy times:Times) then % Si l'instruction est repeat
+
+               %On appelle la fonction FoldL avec les 3 arguments ci-dessous : 
+               %1. {fun {$ Acc _} {DecodeStrategy InnerStrategy} | Acc end} : l'opération à effectuer sur chaque élément de la liste
+               %2. nil : valeur initiale de l'accumulateur
+               %3. {Replicate InnerStrategy Times} : la liste sur laquelle l'opération doit être effectuée
+               
+               {FoldL fun {$ Acc _} {DecodeStrategy InnerStrategy} | Acc end nil {Replicate InnerStrategy Times}} | {DecodeStrategy Rest}
+
+            []'|' then %Si la séparation est une barre verticale
+               {DecodeStrategy Rest} %Ignorer la barre verticale et continuer avec le reste de la stratégie
+
+            end
+         end
       end
+
+
+
+
+
+
+
+
+
+
+
 
       % Options
       Options = options(
