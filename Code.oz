@@ -174,6 +174,9 @@ in
          end
       end
 
+      {Browse {DecodeStrategy [repeat([turn(right)] times:3) forward turn(left)]}}
+
+
 
 
 
