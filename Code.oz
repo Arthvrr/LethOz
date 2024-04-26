@@ -75,7 +75,7 @@ in
 
          case Instruction of
 
-         forward then NewHead NewPositions in %Si la direction est forward
+         forward then NewHead NewPositions NewSpaceship in %Si la direction est forward
 
             NewHead = case Direction of
             north then pos(x:Head.x y:Head.y-1 to:Direction)
@@ -86,9 +86,9 @@ in
 
             NewPositions = NewHead | Tail %NewPositions représente la nouvelle queue modifiée
 
-            Spaceship(positions:NewPositions effects:Spaceship.effects) %On retourne le nouveau spaceship
+            NewSpaceship(positions:NewPositions effects:Spaceship.effects strategy:Spaceship.strategy seismicCharge:Spaceship.seismicCharge)
 
-         []turn(left) then NewHead NewPositions in %Si la direction est left
+         []turn(left) then NewHead NewPositions NewSpaceship in %Si la direction est left
             
             NewHead = case Direction of
             north then west
@@ -98,10 +98,10 @@ in
             end
 
             NewPositions = NewHead | Tail %NewPositions représente la nouvelle queue modifiée
-            
-            Spaceship(positions:NewPositions effects:Spaceship.effects) %On retourne le nouveau spaceship
 
-         []turn(right) then NewHead NewPositions in %Si la direction est right
+            NewSpaceship(positions:NewPositions effects:Spaceship.effects strategy:Spaceship.strategy seismicCharge:Spaceship.seismicCharge)
+
+         []turn(right) then NewHead NewPositions NewSpaceship in %Si la direction est right
 
             NewHead = case Direction of
             north then east
@@ -112,7 +112,7 @@ in
 
             NewPositions = NewHead | Tail %NewPositions représente la nouvelle queue modifiée
 
-            Spaceship(positions:NewPositions effects:Spaceship.effects)
+            NewSpaceship(positions:NewPositions effects:Spaceship.effects strategy:Spaceship.strategy seismicCharge:Spaceship.seismicCharge)
       
          end
 
@@ -127,25 +127,7 @@ in
       %            | repeat(<strategy> times:<integer>) '|' <strategy>
       %            | nil
       fun {DecodeStrategy Strategy}
-         case Strategy of
-            nil then nil % Si aucune instruction, retourne nil
-            [] then nil % Si la liste est vide, retourne nil
-
-            [Instruction|Rest] then
-            
-               case Instruction of
-                  forward then % Si l'instruction est forward
-                     fun {$ Spaceship} {Next Spaceship forward} end | {DecodeStrategy Rest}
-                  [] turn(left) then % Si l'instruction est turn(left)
-                     fun {$ Spaceship} {Next Spaceship turn(left)} end | {DecodeStrategy Rest}
-                  [] turn(right) then % Si l'instruction est turn(right)
-                     fun {$ Spaceship} {Next Spaceship turn(right)} end | {DecodeStrategy Rest}
-                  [] repeat(InnerStrategy times:Times) then % Si l'instruction est repeat
-                     {List.replicate Times {DecodeStrategy InnerStrategy}} | {DecodeStrategy Rest}
-                  [] '|' then % Si la séparation est une barre verticale
-                     {DecodeStrategy Rest} % Ignorer la barre verticale et continuer avec le reste de la stratégie
-               end
-         end
+         Strategy
       end
 
       % Options
