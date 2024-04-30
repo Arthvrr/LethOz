@@ -27,6 +27,7 @@ in
       % Déclarez vos functions ici
       X
       RemoveFirst
+      RemoveLast
       FoldL
       Replicate
    in
@@ -41,6 +42,21 @@ in
          nil then nil
          [] X|Xs then Xs
          end
+      end
+
+      % Fonction permettant d'enlever le dernier élément d'une liste qui nous servira dans le cas de la fonction Next,
+      % car il faut retirer le dernier élément de la Queue 
+
+      fun {RemoveLast L}
+         case L
+         of nil then nil
+         [] H|T then
+            if T == nil then nil
+            else
+               H|{RemoveLast T}
+            end
+         end
+      
       end
 
       % Fonction FoldL, qui pour rappel permet d'appliquer une fonction à chaque élément d'une liste
@@ -80,19 +96,19 @@ in
       %               ]
       %               effects: [scrap|revert|wormhole(x:<P> y:<P>)|... ...]
       %            )
-      fun {Next Spaceship Instruction} Positions Head Tail Last Direction in
+      fun {Next Spaceship Instruction} Positions Head Tail RestTail Direction in
 
          {Browse Instruction}
 
          Positions = Spaceship.positions %Extraire les positions du vaisseau, Positions est une Queue
          Head = Positions.1 %Extraire la tête de la queue Positions
          Tail = {RemoveFirst Positions} %Extraire le reste de la queue Position
-         Last = {List.last Positions} %Extraire le dernier élément de Position
+         RestTail = {RemoveLast Tail}
          Direction = Head.to %Direction à laquelle se dirige le vaisseau
 
          case Instruction of
 
-         forward then NewHead NewPositions NewSpaceship FirstEffect RestEffect in %Si la direction est forward
+         forward then NewHead NewPositions NewSpaceship in %Si la direction est forward
 
             NewHead = case Direction of
             north then pos(x:Head.x y:Head.y-1 to:Direction)
@@ -101,165 +117,45 @@ in
             []west then pos(x:Head.x-1 y:Head.y to:Direction)
             end
 
-            NewPositions = NewHead | Tail %NewPositions représente la nouvelle queue modifiée
+            NewPositions = NewHead | RestTail %NewPositions représente la nouvelle queue modifiée (nouvelle Tête + Queue sans dernier élément)
+            NewSpaceship(positions:NewPositions effects:Spaceship.effects strategy:Spaceship.strategy seismicCharge:Spaceship.seismicCharge)
                
-            %Gestion des effets
-
-            %Si la liste d'effets est vide, on retourne le SpaceShip avec la nouvelle position
-            if Spaceship.effects == nil then NewSpaceship(positions:NewPositions effects:Spaceship.effects strategy:Spaceship.strategy seismicCharge:Spaceship.seismicCharge)
-            else %Si la liste d'effets n'est pas vide, pattern matching pour voir de quel effet il s'agit
-
-               FirstEffect = Spaceship.effects.1 %Récupérer la tête de la liste Spaceship.effects
-               RestEffect = {Tail Spaceship.effects} %Récupérer le reste de la liste Spaceship.effects
-               
-               case FirstEffect of
-               
-               %Si effet scrap
-               scrap then NewTail in
-                  NewTail = case Direction of
-                  north then pos(x:Tail.x y:Tail.y-1 to:Direction)
-                  []south then pos(x:Tail.x y:Tail.y+1 to:Direction)
-                  []east then pos(x:Tail.x+1 y:Tail.y to:Direction)
-                  []west then pos(x:Tail.x-1 y:Tail.y to:Direction)
-                  end
-
-                  NewPositions = NewHead | Tail | NewTail %On ajoute à NewPositions la nouvelle queue NewTail
-                  NewSpaceship(positions:NewPositions effects:RestEffect strategy:Spaceship.strategy seismicCharge:Spaceship.seismicCharge) % Retourner le vaisseau mis à jour avec les effets restants
-
-
-               
-               %Si effet revert
-
-               %1. On inverse la direction du vaisseau
-               %2. On inverse la liste
-
-               []revert then ReverseList in
-               
-                  ReverseList = Last | NewHead
-
-                  NewSpaceship(positions:ReverseList effects:RestEffect strategy:Spaceship.strategy seismicCharge:Spaceship.seismicCharge)
-
-
-
-
-               
-               %Si effet wormhole
-               []wormhole(x:X y:Y) then NewSpaceship(positions:NewPositions effects:Spaceship.effects strategy:Spaceship.strategy seismicCharge:Spaceship.seismicCharge)
-               
-               %Si effet dropSeismicCharge
-               []dropSeismicCharge(L) then NewSpaceship(positions:NewPositions effects:Spaceship.effects strategy:Spaceship.strategy seismicCharge:Spaceship.seismicCharge)
-               end
-            end
+         []turn(left) then NewHead NewPositions NewSpaceship in %Si la direction est left
             
-            
-            
-
-         []turn(left) then NewHead NewPositions NewSpaceship FirstEffect RestEffect in %Si la direction est left
-            
+            % NewHead = case Direction of
+            % north then west
+            % []south then east
+            % []east then north
+            % []west then south
+            % end
             NewHead = case Direction of
-            north then west
-            []south then east
-            []east then north
-            []west then south
+            north then pos(x:Head.x y:Head.y-1 to:west)
+            []south then pos(x:Head.x y:Head.y+1 to:east)
+            []east then pos(x:Head.x+1 y:Head.y to:north)
+            []west then pos(x:Head.x-1 y:Head.y to:south)
             end
 
-            NewPositions = NewHead | Tail %NewPositions représente la nouvelle queue modifiée
+            NewPositions = NewHead | RestTail %NewPositions représente la nouvelle queue modifiée
+            NewSpaceship(positions:NewPositions effects:Spaceship.effects strategy:Spaceship.strategy seismicCharge:Spaceship.seismicCharge)
 
-            %Gestion des effets
+         []turn(right) then NewHead NewPositions NewSpaceship in %Si la direction est right
 
-            %Si la liste d'effets est vide, on retourne le SpaceShip avec la nouvelle position
-            if Spaceship.effects == nil then NewSpaceship(positions:NewPositions effects:Spaceship.effects strategy:Spaceship.strategy seismicCharge:Spaceship.seismicCharge)
-            else %Si la liste d'effets n'est pas vide, pattern matching pour voir de quel effet il s'agit
-
-               FirstEffect = Spaceship.effects.1 %Récupérer la tête de la liste Spaceship.effects
-               RestEffect = {Tail Spaceship.effects} %Récupérer le reste de la liste Spaceship.effects
-               
-               case FirstEffect of
-               
-               %Si effet scrap
-               scrap then NewTail in
-                  NewTail = case Direction of
-                  north then pos(x:Tail.x y:Tail.y-1 to:Direction)
-                  [] south then pos(x:Tail.x y:Tail.y+1 to:Direction)
-                  [] east then pos(x:Tail.x+1 y:Tail.y to:Direction)
-                  [] west then pos(x:Tail.x-1 y:Tail.y to:Direction)
-                  end
-
-                  NewPositions = NewHead | Tail | NewTail %On ajoute à NewPositions la nouvelle queue NewTail
-                  NewSpaceship(positions:NewPositions effects:RestEffect strategy:Spaceship.strategy seismicCharge:Spaceship.seismicCharge) % Retourner le vaisseau mis à jour avec les effets restants
-               
-               %Si effet revert
-
-               %1. On inverse la direction du vaisseau
-               %2. On inverse la liste
-
-               []revert then ReverseList in
-                  
-                  ReverseList = Last | NewHead
-
-                  NewSpaceship(positions:ReverseList effects:RestEffect strategy:Spaceship.strategy seismicCharge:Spaceship.seismicCharge)
-               
-               %Si effet wormhole
-               []wormhole(x:X y:Y) then NewSpaceship(positions:NewPositions effects:Spaceship.effects strategy:Spaceship.strategy seismicCharge:Spaceship.seismicCharge)
-               
-               %Si effet dropSeismicCharge
-               []dropSeismicCharge(L) then NewSpaceship(positions:NewPositions effects:Spaceship.effects strategy:Spaceship.strategy seismicCharge:Spaceship.seismicCharge)
-               end
-            end
-
-         []turn(right) then NewHead NewPositions NewSpaceship FirstEffect RestEffect in %Si la direction est right
-
+            % NewHead = case Direction of
+            % north then east
+            % []south then west
+            % []east then south
+            % []west then north
+            % end
             NewHead = case Direction of
-            north then east
-            []south then west
-            []east then south
-            []west then north
+            north then pos(x:Head.x y:Head.y-1 to:east)
+            []south then pos(x:Head.x y:Head.y+1 to:west)
+            []east then pos(x:Head.x+1 y:Head.y to:south)
+            []west then pos(x:Head.x-1 y:Head.y to:north)
             end
 
-            NewPositions = NewHead | Tail %NewPositions représente la nouvelle queue modifiée
+            NewPositions = NewHead | RestTail %NewPositions représente la nouvelle queue modifiée
+            NewSpaceship(positions:NewPositions effects:Spaceship.effects strategy:Spaceship.strategy seismicCharge:Spaceship.seismicCharge)
 
-            %Gestion des effets
-
-            %Si la liste d'effets est vide, on retourne le SpaceShip avec la nouvelle position
-            if Spaceship.effects == nil then NewSpaceship(positions:NewPositions effects:Spaceship.effects strategy:Spaceship.strategy seismicCharge:Spaceship.seismicCharge)
-            else %Si la liste d'effets n'est pas vide, pattern matching pour voir de quel effet il s'agit
-
-               FirstEffect = Spaceship.effects.1 %Récupérer la tête de la liste Spaceship.effects
-               RestEffect = {Tail Spaceship.effects} %Récupérer le reste de la liste Spaceship.effects
-               
-               case FirstEffect of
-               
-               %Si effet scrap
-               scrap then NewTail in
-                  NewTail = case Direction of
-                  north then pos(x:Tail.x y:Tail.y-1 to:Direction)
-                  [] south then pos(x:Tail.x y:Tail.y+1 to:Direction)
-                  [] east then pos(x:Tail.x+1 y:Tail.y to:Direction)
-                  [] west then pos(x:Tail.x-1 y:Tail.y to:Direction)
-                  end
-
-                  NewPositions = NewHead | Tail | NewTail %On ajoute à NewPositions la nouvelle queue NewTail
-                  NewSpaceship(positions:NewPositions effects:RestEffect strategy:Spaceship.strategy seismicCharge:Spaceship.seismicCharge) % Retourner le vaisseau mis à jour avec les effets restants
-               
-               %Si effet revert
-
-               %1. On inverse la direction du vaisseau
-               %2. On inverse la liste
-
-               []revert then ReverseList in
-                  
-                  ReverseList = Last | NewHead
-
-                  NewSpaceship(positions:ReverseList effects:RestEffect strategy:Spaceship.strategy seismicCharge:Spaceship.seismicCharge)
-               
-               %Si effet wormhole
-               []wormhole(x:X y:Y) then NewSpaceship(positions:NewPositions effects:Spaceship.effects strategy:Spaceship.strategy seismicCharge:Spaceship.seismicCharge)
-               
-               %Si effet dropSeismicCharge
-               []dropSeismicCharge(L) then NewSpaceship(positions:NewPositions effects:Spaceship.effects strategy:Spaceship.strategy seismicCharge:Spaceship.seismicCharge)
-               end
-            end
-      
          end
 
       end
