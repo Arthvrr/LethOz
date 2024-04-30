@@ -6,7 +6,7 @@ in
 	  step: 0
 	  spaceships: [
 		   spaceship(team:yellow name:jason
-			 positions: [pos(x:4 y:3 to:east) pos(x:3 y:3 to:east) pos(x:2 y:3 to:east)]
+			 positions: [pos(x:4 y:2 to:east) pos(x:3 y:2 to:east) pos(x:2 y:2 to:east)]
 			 effects: nil
 			 strategy: keyboard(left:'Left' right:'Right' intro:nil)
 			 seismicCharge: NoBomb

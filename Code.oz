@@ -101,6 +101,7 @@ in
          {Browse Instruction}
 
          Positions = Spaceship.positions %Extraire les positions du vaisseau, Positions est une Queue
+         {Browse Positions}
          Head = Positions.1 %Extraire la tête de la queue Positions
          Tail = {RemoveFirst Positions} %Extraire le reste de la queue Position
          RestTail = {RemoveLast Tail}
@@ -117,43 +118,32 @@ in
             []west then pos(x:Head.x-1 y:Head.y to:Direction)
             end
 
-            NewPositions = NewHead | RestTail %NewPositions représente la nouvelle queue modifiée (nouvelle Tête + Queue sans dernier élément)
+            NewPositions = NewHead | Head | RestTail %NewPositions représente la nouvelle queue modifiée (nouvelle Tête + Queue sans dernier élément)
+            {Browse NewPositions}
             NewSpaceship(positions:NewPositions effects:Spaceship.effects strategy:Spaceship.strategy seismicCharge:Spaceship.seismicCharge)
                
          []turn(left) then NewHead NewPositions NewSpaceship in %Si la direction est left
             
-            % NewHead = case Direction of
-            % north then west
-            % []south then east
-            % []east then north
-            % []west then south
-            % end
             NewHead = case Direction of
-            north then pos(x:Head.x y:Head.y-1 to:west)
-            []south then pos(x:Head.x y:Head.y+1 to:east)
-            []east then pos(x:Head.x+1 y:Head.y to:north)
-            []west then pos(x:Head.x-1 y:Head.y to:south)
+            north then west
+            []south then east
+            []east then north
+            []west then south
             end
 
-            NewPositions = NewHead | RestTail %NewPositions représente la nouvelle queue modifiée
+            NewPositions = NewHead | Head | RestTail %NewPositions représente la nouvelle queue modifiée
             NewSpaceship(positions:NewPositions effects:Spaceship.effects strategy:Spaceship.strategy seismicCharge:Spaceship.seismicCharge)
 
-         []turn(right) then NewHead NewPositions NewSpaceship in %Si la direction est right
+         []turn(right) then NewHead NewPositions NewSpaceship ModifiedHead in %Si la direction est right
 
-            % NewHead = case Direction of
-            % north then east
-            % []south then west
-            % []east then south
-            % []west then north
-            % end
             NewHead = case Direction of
-            north then pos(x:Head.x y:Head.y-1 to:east)
-            []south then pos(x:Head.x y:Head.y+1 to:west)
-            []east then pos(x:Head.x+1 y:Head.y to:south)
-            []west then pos(x:Head.x-1 y:Head.y to:north)
+            north then east
+            []south then west
+            []east then south
+            []west then north
             end
 
-            NewPositions = NewHead | RestTail %NewPositions représente la nouvelle queue modifiée
+            NewPositions = NewHead | Head | RestTail %NewPositions représente la nouvelle queue modifiée
             NewSpaceship(positions:NewPositions effects:Spaceship.effects strategy:Spaceship.strategy seismicCharge:Spaceship.seismicCharge)
 
          end
@@ -200,7 +190,7 @@ in
          end
       end
 
-      %{Browse {DecodeStrategy [repeat([turn(right)] times:3) forward turn(left)]}} %Exemple d'appel pour DecodeStrategy
+      {Browse {DecodeStrategy [repeat([turn(right)] times:3) forward turn(left)]}} %Exemple d'appel pour DecodeStrategy
 
 
       
