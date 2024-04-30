@@ -30,6 +30,7 @@ in
       RemoveLast
       FoldL
       Replicate
+      FlattenListNested
    in
 
       %FONCTIONS ANNEXES, UTILISÉES POUR LES 2 FONCTIONS DE BASE
@@ -101,7 +102,6 @@ in
          {Browse Instruction}
 
          Positions = Spaceship.positions %Extraire les positions du vaisseau, Positions est une Queue
-         {Browse Positions}
          Head = Positions.1 %Extraire la tête de la queue Positions
          Tail = {RemoveFirst Positions} %Extraire le reste de la queue Position
          RestTail = {RemoveLast Tail}
@@ -119,7 +119,6 @@ in
             end
 
             NewPositions = NewHead | Head | RestTail %NewPositions représente la nouvelle queue modifiée (nouvelle Tête + Queue sans dernier élément)
-            {Browse NewPositions}
             NewSpaceship(positions:NewPositions effects:Spaceship.effects strategy:Spaceship.strategy seismicCharge:Spaceship.seismicCharge)
                
          []turn(left) then NewHead NewPositions NewSpaceship in %Si la direction est left
@@ -158,6 +157,37 @@ in
       % strategy ::= <instruction> '|' <strategy>
       %            | repeat(<strategy> times:<integer>) '|' <strategy>
       %            | nil
+      % fun {DecodeStrategy Strategy}
+      %    case Strategy of
+      %    nil then nil %Si aucune instruction, retourne nil
+      %    []Instruction|Rest then
+      
+      %       case Instruction of
+      
+      %       forward then %Si l'instruction est forward
+      %          fun {$ Spaceship} {Next Spaceship forward} end | {DecodeStrategy Rest}
+
+      %       []turn(left) then %Si l'instruction est turn(left)
+      %          fun {$ Spaceship} {Next Spaceship turn(left)} end | {DecodeStrategy Rest}
+
+      %       []turn(right) then %Si l'instruction est turn(right)
+      %          fun {$ Spaceship} {Next Spaceship turn(right)} end | {DecodeStrategy Rest}
+
+      %       []repeat(InnerStrategy times:Times) then % Si l'instruction est repeat
+
+      %          %On appelle la fonction FoldL avec les 3 arguments ci-dessous : 
+      %          %1. {fun {$ Acc _} {DecodeStrategy InnerStrategy} | Acc end} : l'opération à effectuer sur chaque élément de la liste
+      %          %2. nil : valeur initiale de l'accumulateur
+      %          %3. {Replicate InnerStrategy Times} : la liste sur laquelle l'opération doit être effectuée
+               
+      %          {FoldL fun {$ Acc _} {DecodeStrategy InnerStrategy} | Acc end nil {Replicate InnerStrategy Times}} | {DecodeStrategy Rest}
+
+      %       []'|' then %Si la séparation est une barre verticale
+      %          {DecodeStrategy Rest} %Ignorer la barre verticale et continuer avec le reste de la stratégie
+
+      %       end
+      %    end
+      % end
       fun {DecodeStrategy Strategy}
          case Strategy of
          nil then nil %Si aucune instruction, retourne nil
@@ -166,13 +196,13 @@ in
             case Instruction of
       
             forward then %Si l'instruction est forward
-               fun {$ Spaceship} {Next Spaceship forward} end | {DecodeStrategy Rest}
+               fun {$ Spaceship} [{Next Spaceship forward} end {DecodeStrategy Rest}]
 
             []turn(left) then %Si l'instruction est turn(left)
-               fun {$ Spaceship} {Next Spaceship turn(left)} end | {DecodeStrategy Rest}
+               fun {$ Spaceship} [{Next Spaceship turn(left)} end {DecodeStrategy Rest}]
 
             []turn(right) then %Si l'instruction est turn(right)
-               fun {$ Spaceship} {Next Spaceship turn(right)} end | {DecodeStrategy Rest}
+               fun {$ Spaceship} [{Next Spaceship turn(right)} end {DecodeStrategy Rest}]
 
             []repeat(InnerStrategy times:Times) then % Si l'instruction est repeat
 
@@ -183,14 +213,16 @@ in
                
                {FoldL fun {$ Acc _} {DecodeStrategy InnerStrategy} | Acc end nil {Replicate InnerStrategy Times}} | {DecodeStrategy Rest}
 
+
             []'|' then %Si la séparation est une barre verticale
                {DecodeStrategy Rest} %Ignorer la barre verticale et continuer avec le reste de la stratégie
 
             end
          end
       end
-
+   
       {Browse {DecodeStrategy [repeat([turn(right)] times:3) forward turn(left)]}} %Exemple d'appel pour DecodeStrategy
+
 
 
       

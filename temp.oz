@@ -36,16 +36,17 @@ else %Si la liste d'effets n'est pas vide, pattern matching pour voir de quel ef
 
         NewSpaceship(positions:ReverseList effects:RestEffect strategy:Spaceship.strategy seismicCharge:Spaceship.seismicCharge)
 
-
-
-
-    
     %Si effet wormhole
-    []wormhole(x:X y:Y) then NewSpaceship(positions:NewPositions effects:Spaceship.effects strategy:Spaceship.strategy seismicCharge:Spaceship.seismicCharge)
+    []wormhole(x:X y:Y) then TeleportedHead in
+        %il faut téléporter au point X, Y
+        TeleportedHead = pos(x:X y:Y to:Direction) %TeleportedHead prend les coordonnées X Y passés en arguments
+
+        NewPositions = TeleportedHead | RestTail %On lie les 2 dans une Queue
+        NewSpaceship(positions:NewPositions effects:RestEffect strategy:Spaceship.strategy seismicCharge:Spaceship.seismicCharge)
     
     %Si effet dropSeismicCharge
     []dropSeismicCharge(L) then NewSpaceship(positions:NewPositions effects:Spaceship.effects strategy:Spaceship.strategy seismicCharge:Spaceship.seismicCharge)
     end
 end
 
-
+ 
