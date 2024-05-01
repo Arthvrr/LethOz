@@ -205,9 +205,13 @@ in
             
                      else %Si le bouclier n'est pas actif ou que NumberShield est pas plus grand que 0
                         %On applique l'effet
-                        ListToAppend = Spaceship.seismicCharge
-                        {List.append ListToAppend L}
-                        NewSpaceship(positions:NewPositions effects:RestEffect strategy:Spaceship.strategy seismicCharge:ListToAppend)
+                        if L == nil then %Si la liste L est vide
+                           NewSpaceship(positions:NewPositions effects:RestEffect strategy:Spaceship.strategy seismicCharge:Spaceship.seismicCharge)
+                        else %Si L n'est pas vide on l'append à la liste Spaceship.SeismicCharge
+                           ListToAppend = Spaceship.seismicCharge
+                           {List.append ListToAppend L} %On append avec List.append provenant de la documentation
+                           NewSpaceship(positions:NewPositions effects:RestEffect strategy:Spaceship.strategy seismicCharge:ListToAppend)
+                        end
             
                      end
 
@@ -332,9 +336,13 @@ in
             
                      else %Si le bouclier n'est pas actif ou que NumberShield est pas plus grand que 0
                         %On applique l'effet
-                        ListToAppend = Spaceship.seismicCharge
-                        {List.append ListToAppend L}
-                        NewSpaceship(positions:NewPositions effects:RestEffect strategy:Spaceship.strategy seismicCharge:ListToAppend)
+                        if L == nil then %Si la liste L est vide
+                           NewSpaceship(positions:NewPositions effects:RestEffect strategy:Spaceship.strategy seismicCharge:Spaceship.seismicCharge)
+                        else %Si L n'est pas vide on l'append à la liste Spaceship.SeismicCharge
+                           ListToAppend = Spaceship.seismicCharge
+                           {List.append ListToAppend L} %On append avec List.append provenant de la documentation
+                           NewSpaceship(positions:NewPositions effects:RestEffect strategy:Spaceship.strategy seismicCharge:ListToAppend)
+                        end
             
                      end
 
@@ -458,9 +466,13 @@ in
             
                      else %Si le bouclier n'est pas actif ou que NumberShield est pas plus grand que 0
                         %On applique l'effet
-                        ListToAppend = Spaceship.seismicCharge
-                        {List.append ListToAppend L}
-                        NewSpaceship(positions:NewPositions effects:RestEffect strategy:Spaceship.strategy seismicCharge:ListToAppend)
+                        if L == nil then %Si la liste L est vide
+                           NewSpaceship(positions:NewPositions effects:RestEffect strategy:Spaceship.strategy seismicCharge:Spaceship.seismicCharge)
+                        else %Si L n'est pas vide on l'append à la liste Spaceship.SeismicCharge
+                           ListToAppend = Spaceship.seismicCharge
+                           {List.append ListToAppend L} %On append avec List.append provenant de la documentation
+                           NewSpaceship(positions:NewPositions effects:RestEffect strategy:Spaceship.strategy seismicCharge:ListToAppend)
+                        end
             
                      end
 
