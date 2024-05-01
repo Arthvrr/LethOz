@@ -197,7 +197,7 @@ in
                   
 
                   %EFFET DROPSEISMICCHARGE
-                  []dropSeismicCharge(L) then ListToAppend in
+                  []dropSeismicCharge(L) then
                      if NumberShield > 0 then %Si NumberShield est supérier à 0
                         NumberShield = NumberShield - 1 %On décrémente de 1 NumberShield
                         %On skip l'effet
@@ -206,11 +206,11 @@ in
                      else %Si le bouclier n'est pas actif ou que NumberShield est pas plus grand que 0
                         %On applique l'effet
                         if L == nil then %Si la liste L est vide
+                           {List.append Spaceship.seismicCharge true | nil} %On append avec List.append provenant de la documentation
                            NewSpaceship(positions:NewPositions effects:RestEffect strategy:Spaceship.strategy seismicCharge:Spaceship.seismicCharge)
                         else %Si L n'est pas vide on l'append à la liste Spaceship.SeismicCharge
-                           ListToAppend = Spaceship.seismicCharge
-                           {List.append ListToAppend L} %On append avec List.append provenant de la documentation
-                           NewSpaceship(positions:NewPositions effects:RestEffect strategy:Spaceship.strategy seismicCharge:ListToAppend)
+                           {List.append Spaceship.seismicCharge L} %On append avec List.append provenant de la documentation
+                           NewSpaceship(positions:NewPositions effects:RestEffect strategy:Spaceship.strategy seismicCharge:Spaceship.seismicCharge)
                         end
             
                      end
@@ -328,7 +328,7 @@ in
                   
 
                   %EFFET DROPSEISMICCHARGE
-                  []dropSeismicCharge(L) then ListToAppend in
+                  []dropSeismicCharge(L) then
                      if NumberShield > 0 then %Si NumberShield est supérier à 0
                         NumberShield = NumberShield - 1 %On décrémente de 1 NumberShield
                         %On skip l'effet
@@ -337,11 +337,11 @@ in
                      else %Si le bouclier n'est pas actif ou que NumberShield est pas plus grand que 0
                         %On applique l'effet
                         if L == nil then %Si la liste L est vide
+                           {List.append Spaceship.seismicCharge true | nil} %On append avec List.append provenant de la documentation
                            NewSpaceship(positions:NewPositions effects:RestEffect strategy:Spaceship.strategy seismicCharge:Spaceship.seismicCharge)
                         else %Si L n'est pas vide on l'append à la liste Spaceship.SeismicCharge
-                           ListToAppend = Spaceship.seismicCharge
-                           {List.append ListToAppend L} %On append avec List.append provenant de la documentation
-                           NewSpaceship(positions:NewPositions effects:RestEffect strategy:Spaceship.strategy seismicCharge:ListToAppend)
+                           {List.append Spaceship.seismicCharge L} %On append avec List.append provenant de la documentation
+                           NewSpaceship(positions:NewPositions effects:RestEffect strategy:Spaceship.strategy seismicCharge:Spaceship.seismicCharge)
                         end
             
                      end
@@ -458,7 +458,7 @@ in
                   
 
                   %EFFET DROPSEISMICCHARGE
-                  []dropSeismicCharge(L) then ListToAppend in
+                  []dropSeismicCharge(L) then
                      if NumberShield > 0 then %Si NumberShield est supérier à 0
                         NumberShield = NumberShield - 1 %On décrémente de 1 NumberShield
                         %On skip l'effet
@@ -467,11 +467,11 @@ in
                      else %Si le bouclier n'est pas actif ou que NumberShield est pas plus grand que 0
                         %On applique l'effet
                         if L == nil then %Si la liste L est vide
+                           {List.append Spaceship.seismicCharge true | nil} %On append avec List.append provenant de la documentation
                            NewSpaceship(positions:NewPositions effects:RestEffect strategy:Spaceship.strategy seismicCharge:Spaceship.seismicCharge)
                         else %Si L n'est pas vide on l'append à la liste Spaceship.SeismicCharge
-                           ListToAppend = Spaceship.seismicCharge
-                           {List.append ListToAppend L} %On append avec List.append provenant de la documentation
-                           NewSpaceship(positions:NewPositions effects:RestEffect strategy:Spaceship.strategy seismicCharge:ListToAppend)
+                           {List.append Spaceship.seismicCharge L} %On append avec List.append provenant de la documentation
+                           NewSpaceship(positions:NewPositions effects:RestEffect strategy:Spaceship.strategy seismicCharge:Spaceship.seismicCharge)
                         end
             
                      end
@@ -540,20 +540,20 @@ in
 
             []'|' then %Si la séparation est une barre verticale
                {DecodeStrategy Rest} %Ignorer la barre verticale et continuer avec le reste de la stratégie
-
+            
             end
          end
       end
       
    
-      {Browse {DecodeStrategy [repeat([turn(right)] times:3) forward turn(left)]}} %Exemple d'appel pour DecodeStrategy
+      %{Browse {DecodeStrategy [repeat([turn(right)] times:3) forward turn(left)]}} %Exemple d'appel pour DecodeStrategy
 
 
 
       % Options
       Options = options(
 		   % Fichier contenant le scénario (depuis Dossier)
-		   scenario:'scenario/scenario_crazy.oz'
+		   scenario:'scenario/scenario.oz'
 		   % Utilisez cette touche pour quitter la fenêtre
 		   closeKey:'Espace' %Pour stopper la fenêtre de jeu : Cmd + Shift + P et oz.spawn
 		   % Visualisation de la partie
