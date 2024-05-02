@@ -47,8 +47,8 @@ in
       % Fonction permettant d'enlever le dernier élément d'une liste qui nous servira dans le cas de la fonction Next,
       % car il faut retirer le dernier élément de la Queue Positions
       fun {RemoveLast L}
-         case L
-         of nil then nil
+         case L of
+         nil then nil
          [] H|T then
             if T == nil then nil
             else
@@ -78,9 +78,7 @@ in
       
 
 
-
       %LES 2 FONCTIONS DE BASE, NEXT ET DECODESTRATEGY
-
 
       % La fonction qui renvoit les nouveaux attributs du serpent après prise
       % en compte des effets qui l'affectent et de son instruction
@@ -102,8 +100,8 @@ in
 
          Positions = Spaceship.positions %Extraire les positions du vaisseau, Positions est une Queue
          Head = Positions.1 %Extraire la tête de la queue Positions
-         Tail = {RemoveFirst Positions} %Extraire le reste de la queue Position
-         RestTail = {RemoveLast Tail} %Enlever le dernier élément de la Tail
+         Tail = {RemoveFirst Positions} %Extraire le reste de la queue Position avec RemoveFirst
+         RestTail = {RemoveLast Tail} %Enlever le dernier élément de la Tail avec RemoveLast
          Direction = Head.to %Direction à laquelle se dirige le vaisseau
 
          case Instruction of
@@ -128,7 +126,7 @@ in
 
                FirstEffect = Spaceship.effects.1 %Récupérer la tête de la liste Spaceship.effects
                RestEffect = {Tail Spaceship.effects} %Récupérer le reste de la liste Spaceship.effects
-               NumberShield = 0 %Nombre de tours qu'il est possible d'utiliser pour le Shield
+               NumberShield = 0 %Nombre de tours qu'il est possible d'utiliser pour le Shield, initialisé à 0 au départ
 
                case FirstEffect of
 
@@ -136,7 +134,7 @@ in
                shield(N) then
                
                NumberShield = N %On change la valeur de NumberShield par N
-               NewSpaceship(positions:Positions effects:RestEffect strategy:Spaceship.strategy seismicCharge:Spaceship.seismicCharge)
+               NewSpaceship(positions:Positions effects:RestEffect strategy:Spaceship.strategy seismicCharge:Spaceship.seismicCharge) %On passe à l'effet suivant
 
                %EFFET SCRAP
                []scrap then NewTail in
@@ -145,7 +143,7 @@ in
                      %On skip l'effet
                      NewSpaceship(positions:Positions effects:RestEffect strategy:Spaceship.strategy seismicCharge:Spaceship.seismicCharge)
          
-                  else %Si le bouclier n'est pas actif ou que NumberShield est pas plus grand que 0
+                  else %Si NumberShield n'est pas plus grand que 0
                      %On applique l'effet
                      NewTail = case Direction of
                      north then pos(x:Tail.x y:Tail.y-1 to:Direction)
@@ -165,7 +163,7 @@ in
                      %On skip l'effet
                      NewSpaceship(positions:Positions effects:RestEffect strategy:Spaceship.strategy seismicCharge:Spaceship.seismicCharge)
                   
-                  else %Si le bouclier n'est pas actif ou que NumberShield est pas plus grand que 0
+                  else %Si NumberShield n'est pas plus grand que 0
                      %On applique l'effet
                      NewDirection = case Direction of %On inverse la direction du vaisseau
                      north then pos(x:Head.x y:Head.y to:Direction)
@@ -175,7 +173,7 @@ in
                      end
          
                      ToReverse = NewHead | RestTail
-                     ReverseList = {Reverse ToReverse} %Liste inversée
+                     ReverseList = {List.reverse ToReverse} %Liste inversée
                      NewSpaceship(positions:ReverseList effects:RestEffect strategy:Spaceship.strategy seismicCharge:Spaceship.seismicCharge)
                   end
                
@@ -186,7 +184,7 @@ in
                         %On skip l'effet
                         NewSpaceship(positions:Positions effects:RestEffect strategy:Spaceship.strategy seismicCharge:Spaceship.seismicCharge)
             
-                     else %Si le bouclier n'est pas actif ou que NumberShield est pas plus grand que 0
+                     else %Si NumberShield n'est pas plus grand que 0
                         %On applique l'effet
                         %il faut téléporter au point X, Y
                         TeleportedHead = pos(x:X y:Y to:Direction) %TeleportedHead prend les coordonnées X Y passés en arguments
@@ -203,7 +201,7 @@ in
                         %On skip l'effet
                         NewSpaceship(positions:Positions effects:RestEffect strategy:Spaceship.strategy seismicCharge:Spaceship.seismicCharge)
             
-                     else %Si le bouclier n'est pas actif ou que NumberShield est pas plus grand que 0
+                     else %Si NumberShield n'est pas plus grand que 0
                         %On applique l'effet
                         if L == nil then %Si la liste L est vide
                            {List.append Spaceship.seismicCharge true | nil} %On append avec List.append provenant de la documentation
@@ -223,7 +221,7 @@ in
                         %On skip l'effet
                         NewSpaceship(positions:Positions effects:RestEffect strategy:Spaceship.strategy seismicCharge:Spaceship.seismicCharge)
             
-                     else %Si le bouclier n'est pas actif ou que NumberShield est pas plus grand que 0
+                     else %Si NumberShield n'est pas plus grand que 0
                         
                         %On applique l'effet
                         if N > 0 then % Vérifie si le nombre de tours de gel est supérieur à 0
@@ -259,7 +257,7 @@ in
 
                FirstEffect = Spaceship.effects.1 %Récupérer la tête de la liste Spaceship.effects
                RestEffect = {Tail Spaceship.effects} %Récupérer le reste de la liste Spaceship.effects
-               NumberShield = 0 %Nombre de tours qu'il est possible d'utiliser pour le Shield
+               NumberShield = 0 %Nombre de tours qu'il est possible d'utiliser pour le Shield, initialisé à 0 au départ
 
                case FirstEffect of
 
@@ -267,7 +265,7 @@ in
                shield(N) then
                
                NumberShield = N %On change la valeur de NumberShield par N
-               NewSpaceship(positions:Positions effects:RestEffect strategy:Spaceship.strategy seismicCharge:Spaceship.seismicCharge)
+               NewSpaceship(positions:Positions effects:RestEffect strategy:Spaceship.strategy seismicCharge:Spaceship.seismicCharge) %On passe à l'effet suivant
 
                %EFFET SCRAP
                []scrap then NewTail in
@@ -276,7 +274,7 @@ in
                      %On skip l'effet
                      NewSpaceship(positions:Positions effects:RestEffect strategy:Spaceship.strategy seismicCharge:Spaceship.seismicCharge)
          
-                  else %Si le bouclier n'est pas actif ou que NumberShield est pas plus grand que 0
+                  else %Si NumberShield n'est pas plus grand que 0
                      %On applique l'effet
                      NewTail = case Direction of
                      north then pos(x:Tail.x y:Tail.y-1 to:Direction)
@@ -296,7 +294,7 @@ in
                      %On skip l'effet
                      NewSpaceship(positions:Positions effects:RestEffect strategy:Spaceship.strategy seismicCharge:Spaceship.seismicCharge)
                   
-                  else %Si le bouclier n'est pas actif ou que NumberShield est pas plus grand que 0
+                  else %Si NumberShield n'est pas plus grand que 0
                      %On applique l'effet
                      NewDirection = case Direction of %On inverse la direction du vaisseau
                      north then pos(x:Head.x y:Head.y to:Direction)
@@ -306,7 +304,7 @@ in
                      end
          
                      ToReverse = NewHead | RestTail
-                     ReverseList = {Reverse ToReverse} %Liste inversée
+                     ReverseList = {List.reverse ToReverse} %Liste inversée
                      NewSpaceship(positions:ReverseList effects:RestEffect strategy:Spaceship.strategy seismicCharge:Spaceship.seismicCharge)
                   end
                
@@ -317,7 +315,7 @@ in
                         %On skip l'effet
                         NewSpaceship(positions:Positions effects:RestEffect strategy:Spaceship.strategy seismicCharge:Spaceship.seismicCharge)
             
-                     else %Si le bouclier n'est pas actif ou que NumberShield est pas plus grand que 0
+                     else %Si NumberShield n'est pas plus grand que 0
                         %On applique l'effet
                         %il faut téléporter au point X, Y
                         TeleportedHead = pos(x:X y:Y to:Direction) %TeleportedHead prend les coordonnées X Y passés en arguments
@@ -334,7 +332,7 @@ in
                         %On skip l'effet
                         NewSpaceship(positions:Positions effects:RestEffect strategy:Spaceship.strategy seismicCharge:Spaceship.seismicCharge)
             
-                     else %Si le bouclier n'est pas actif ou que NumberShield est pas plus grand que 0
+                     else %Si NumberShield n'est pas plus grand que 0
                         %On applique l'effet
                         if L == nil then %Si la liste L est vide
                            {List.append Spaceship.seismicCharge true | nil} %On append avec List.append provenant de la documentation
@@ -354,7 +352,7 @@ in
                         %On skip l'effet
                         NewSpaceship(positions:Positions effects:RestEffect strategy:Spaceship.strategy seismicCharge:Spaceship.seismicCharge)
             
-                     else %Si le bouclier n'est pas actif ou que NumberShield est pas plus grand que 0
+                     else %Si NumberShield n'est pas plus grand que 0
                         
                         %On applique l'effet
                         if N > 0 then % Vérifie si le nombre de tours de gel est supérieur à 0
@@ -381,7 +379,7 @@ in
 
             %GESTION DES EFFETS
             if Spaceship.effects == nil then %Si la liste d'effets est vide, on retourne le SpaceShip avec la nouvelle position
-               NewSpaceship(positions:NewPositions effects:Spaceship.effects strategy:Spaceship.strategy seismicCharge:Spaceship.seismicCharge)
+               NewSpaceship(positions:NewPositions effects:Spaceship.effects strategy:Spaceship.strategy seismicCharge:Spaceship.seismicCharge) %On passe à l'effet suivant
 
 
             %Si la liste d'effets n'est pas vide, pattern matching pour voir de quel effet il s'agit
@@ -389,7 +387,7 @@ in
 
                FirstEffect = Spaceship.effects.1 %Récupérer la tête de la liste Spaceship.effects
                RestEffect = {Tail Spaceship.effects} %Récupérer le reste de la liste Spaceship.effects
-               NumberShield = 0 %Nombre de tours qu'il est possible d'utiliser pour le Shield
+               NumberShield = 0 %Nombre de tours qu'il est possible d'utiliser pour le Shield, initialisé à 0 au départ
 
                case FirstEffect of
 
@@ -406,7 +404,7 @@ in
                      %On skip l'effet
                      NewSpaceship(positions:Positions effects:RestEffect strategy:Spaceship.strategy seismicCharge:Spaceship.seismicCharge)
          
-                  else %Si le bouclier n'est pas actif ou que NumberShield est pas plus grand que 0
+                  else %Si NumberShield n'est pas plus grand que 0
                      %On applique l'effet
                      NewTail = case Direction of
                      north then pos(x:Tail.x y:Tail.y-1 to:Direction)
@@ -426,7 +424,7 @@ in
                      %On skip l'effet
                      NewSpaceship(positions:Positions effects:RestEffect strategy:Spaceship.strategy seismicCharge:Spaceship.seismicCharge)
                   
-                  else %Si le bouclier n'est pas actif ou que NumberShield est pas plus grand que 0
+                  else %Si NumberShield n'est pas plus grand que 0
                      %On applique l'effet
                      NewDirection = case Direction of %On inverse la direction du vaisseau
                      north then pos(x:Head.x y:Head.y to:Direction)
@@ -436,7 +434,7 @@ in
                      end
          
                      ToReverse = NewHead | RestTail
-                     ReverseList = {Reverse ToReverse} %Liste inversée
+                     ReverseList = {List.reverse ToReverse} %Liste inversée
                      NewSpaceship(positions:ReverseList effects:RestEffect strategy:Spaceship.strategy seismicCharge:Spaceship.seismicCharge)
                   end
                
@@ -447,7 +445,7 @@ in
                         %On skip l'effet
                         NewSpaceship(positions:Positions effects:RestEffect strategy:Spaceship.strategy seismicCharge:Spaceship.seismicCharge)
             
-                     else %Si le bouclier n'est pas actif ou que NumberShield est pas plus grand que 0
+                     else %Si NumberShield n'est pas plus grand que 0
                         %On applique l'effet
                         %il faut téléporter au point X, Y
                         TeleportedHead = pos(x:X y:Y to:Direction) %TeleportedHead prend les coordonnées X Y passés en arguments
@@ -464,7 +462,7 @@ in
                         %On skip l'effet
                         NewSpaceship(positions:Positions effects:RestEffect strategy:Spaceship.strategy seismicCharge:Spaceship.seismicCharge)
             
-                     else %Si le bouclier n'est pas actif ou que NumberShield est pas plus grand que 0
+                     else %Si NumberShield n'est pas plus grand que 0
                         %On applique l'effet
                         if L == nil then %Si la liste L est vide
                            {List.append Spaceship.seismicCharge true | nil} %On append avec List.append provenant de la documentation
@@ -484,7 +482,7 @@ in
                         %On skip l'effet
                         NewSpaceship(positions:Positions effects:RestEffect strategy:Spaceship.strategy seismicCharge:Spaceship.seismicCharge)
             
-                     else %Si le bouclier n'est pas actif ou que NumberShield est pas plus grand que 0
+                     else %Si NumberShield n'est pas plus grand que 0
                         
                         %On applique l'effet
                         if N > 0 then % Vérifie si le nombre de tours de gel est supérieur à 0
@@ -546,6 +544,7 @@ in
       end
       
    
+      %Exemple d'appel de DecodeStrategy
       %{Browse {DecodeStrategy [repeat([turn(right)] times:3) forward turn(left)]}} %Exemple d'appel pour DecodeStrategy
 
 
