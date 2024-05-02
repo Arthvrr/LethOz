@@ -44,6 +44,7 @@ in
          end
       end
 
+
       % Fonction permettant d'enlever le dernier élément d'une liste qui nous servira dans le cas de la fonction Next,
       % car il faut retirer le dernier élément de la Queue Positions
       fun {RemoveLast L}
@@ -58,6 +59,7 @@ in
       
       end
 
+
       % Fonction FoldL, qui pour rappel permet d'appliquer une fonction à chaque élément d'une liste
       % que l'on va utiliser dans la fonction DecodeStrategy
       fun {FoldL Fun Initial List}
@@ -67,6 +69,7 @@ in
             {FoldL Fun {Fun Initial X} Xs}
          end
       end
+
 
       % Fonction Replicate, qui permet de répliquer un élément donné un certain nombre de fois et retourner la liste
       fun {Replicate Element Times}
@@ -132,9 +135,10 @@ in
 
                %EFFET SHIELD
                shield(N) then
-               
+            
                NumberShield = N %On change la valeur de NumberShield par N
                NewSpaceship(positions:Positions effects:RestEffect strategy:Spaceship.strategy seismicCharge:Spaceship.seismicCharge) %On passe à l'effet suivant
+
 
                %EFFET SCRAP
                []scrap then NewTail in
@@ -156,6 +160,7 @@ in
                      NewSpaceship(positions:NewPositions effects:RestEffect strategy:Spaceship.strategy seismicCharge:Spaceship.seismicCharge)
                   end
                
+
                %EFFET REVERT
                []revert then NewDirection ReverseList ToReverse in
                   if NumberShield > 0 then %Si NumberShield est supérier à 0
@@ -177,66 +182,67 @@ in
                      NewSpaceship(positions:ReverseList effects:RestEffect strategy:Spaceship.strategy seismicCharge:Spaceship.seismicCharge)
                   end
                
-                  %EFFET WORMHOLE
-                  []wormhole(x:X y:Y) then TeleportedHead in
-                     if NumberShield > 0 then %Si NumberShield est supérier à 0
-                        NumberShield = NumberShield - 1 %On décrémente de 1 NumberShield
-                        %On skip l'effet
-                        NewSpaceship(positions:Positions effects:RestEffect strategy:Spaceship.strategy seismicCharge:Spaceship.seismicCharge)
-            
-                     else %Si NumberShield n'est pas plus grand que 0
-                        %On applique l'effet
-                        %il faut téléporter au point X, Y
-                        TeleportedHead = pos(x:X y:Y to:Direction) %TeleportedHead prend les coordonnées X Y passés en arguments
-                        NewPositions = TeleportedHead | RestTail %On lie les 2 dans une Queue
+
+               %EFFET WORMHOLE
+               []wormhole(x:X y:Y) then TeleportedHead in
+                  if NumberShield > 0 then %Si NumberShield est supérier à 0
+                     NumberShield = NumberShield - 1 %On décrémente de 1 NumberShield
+                     %On skip l'effet
+                     NewSpaceship(positions:Positions effects:RestEffect strategy:Spaceship.strategy seismicCharge:Spaceship.seismicCharge)
+         
+                  else %Si NumberShield n'est pas plus grand que 0
+                     %On applique l'effet
+                     %il faut téléporter au point X, Y
+                     TeleportedHead = pos(x:X y:Y to:Direction) %TeleportedHead prend les coordonnées X Y passés en arguments
+                     NewPositions = TeleportedHead | RestTail %On lie les 2 dans une Queue
+                     NewSpaceship(positions:NewPositions effects:RestEffect strategy:Spaceship.strategy seismicCharge:Spaceship.seismicCharge)
+         
+                  end
+               
+
+               %EFFET DROPSEISMICCHARGE
+               []dropSeismicCharge(L) then
+                  if NumberShield > 0 then %Si NumberShield est supérier à 0
+                     NumberShield = NumberShield - 1 %On décrémente de 1 NumberShield
+                     %On skip l'effet
+                     NewSpaceship(positions:Positions effects:RestEffect strategy:Spaceship.strategy seismicCharge:Spaceship.seismicCharge)
+         
+                  else %Si NumberShield n'est pas plus grand que 0
+                     %On applique l'effet
+                     if L == nil then %Si la liste L est vide
+                        {List.append Spaceship.seismicCharge true | nil} %On append avec List.append provenant de la documentation
                         NewSpaceship(positions:NewPositions effects:RestEffect strategy:Spaceship.strategy seismicCharge:Spaceship.seismicCharge)
-            
+                     else %Si L n'est pas vide on l'append à la liste Spaceship.SeismicCharge
+                        {List.append Spaceship.seismicCharge L} %On append avec List.append provenant de la documentation
+                        NewSpaceship(positions:NewPositions effects:RestEffect strategy:Spaceship.strategy seismicCharge:Spaceship.seismicCharge)
                      end
-                  
+         
+                  end
 
-                  %EFFET DROPSEISMICCHARGE
-                  []dropSeismicCharge(L) then
-                     if NumberShield > 0 then %Si NumberShield est supérier à 0
-                        NumberShield = NumberShield - 1 %On décrémente de 1 NumberShield
-                        %On skip l'effet
-                        NewSpaceship(positions:Positions effects:RestEffect strategy:Spaceship.strategy seismicCharge:Spaceship.seismicCharge)
-            
-                     else %Si NumberShield n'est pas plus grand que 0
-                        %On applique l'effet
-                        if L == nil then %Si la liste L est vide
-                           {List.append Spaceship.seismicCharge true | nil} %On append avec List.append provenant de la documentation
-                           NewSpaceship(positions:NewPositions effects:RestEffect strategy:Spaceship.strategy seismicCharge:Spaceship.seismicCharge)
-                        else %Si L n'est pas vide on l'append à la liste Spaceship.SeismicCharge
-                           {List.append Spaceship.seismicCharge L} %On append avec List.append provenant de la documentation
-                           NewSpaceship(positions:NewPositions effects:RestEffect strategy:Spaceship.strategy seismicCharge:Spaceship.seismicCharge)
-                        end
-            
+
+               %EFFET FROST
+               []frost(N) then NewEffect in
+                  if NumberShield > 0 then %Si NumberShield est supérier à 0
+                     NumberShield = NumberShield - 1 %On décrémente de 1 NumberShield
+                     %On skip l'effet
+                     NewSpaceship(positions:Positions effects:RestEffect strategy:Spaceship.strategy seismicCharge:Spaceship.seismicCharge)
+         
+                  else %Si NumberShield n'est pas plus grand que 0
+                     
+                     %On applique l'effet
+                     if N > 0 then % Vérifie si le nombre de tours de gel est supérieur à 0
+                        NewEffect = frost(N-1) | RestEffect % On réduit le nombre de tours restants de 1 et on conserve l'effet frost pour le tour suivant
+                     else
+                        NewEffect = RestEffect % Si le nombre de tours restants est de 0, on passe simplement à l'effet suivant
                      end
-
-
-                  %EFFET FROST
-                  []frost(N) then NewEffect in
-                     if NumberShield > 0 then %Si NumberShield est supérier à 0
-                        NumberShield = NumberShield - 1 %On décrémente de 1 NumberShield
-                        %On skip l'effet
-                        NewSpaceship(positions:Positions effects:RestEffect strategy:Spaceship.strategy seismicCharge:Spaceship.seismicCharge)
-            
-                     else %Si NumberShield n'est pas plus grand que 0
-                        
-                        %On applique l'effet
-                        if N > 0 then % Vérifie si le nombre de tours de gel est supérieur à 0
-                           NewEffect = frost(N-1) | RestEffect % On réduit le nombre de tours restants de 1 et on conserve l'effet frost pour le tour suivant
-                        else
-                           NewEffect = RestEffect % Si le nombre de tours restants est de 0, on passe simplement à l'effet suivant
-                        end
-            
-                        NewSpaceship(positions: Positions effects: NewEffect strategy: Spaceship.strategy seismicCharge: Spaceship.seismicCharge)
-            
-                     end
-
+         
+                     NewSpaceship(positions: Positions effects: NewEffect strategy: Spaceship.strategy seismicCharge: Spaceship.seismicCharge)
+         
+                  end
             end
-            
          end
+
+
          %INSTRUCTION TURN(LEFT)
          []turn(left) then NewHead NewPositions NewSpaceship in %Si la direction est left
             
@@ -267,6 +273,7 @@ in
                NumberShield = N %On change la valeur de NumberShield par N
                NewSpaceship(positions:Positions effects:RestEffect strategy:Spaceship.strategy seismicCharge:Spaceship.seismicCharge) %On passe à l'effet suivant
 
+
                %EFFET SCRAP
                []scrap then NewTail in
                   if NumberShield > 0 then %Si NumberShield est supérier à 0
@@ -287,6 +294,7 @@ in
                      NewSpaceship(positions:NewPositions effects:RestEffect strategy:Spaceship.strategy seismicCharge:Spaceship.seismicCharge)
                   end
                
+
                %EFFET REVERT
                []revert then NewDirection ReverseList ToReverse in
                   if NumberShield > 0 then %Si NumberShield est supérier à 0
@@ -308,65 +316,67 @@ in
                      NewSpaceship(positions:ReverseList effects:RestEffect strategy:Spaceship.strategy seismicCharge:Spaceship.seismicCharge)
                   end
                
-                  %EFFET WORMHOLE
-                  []wormhole(x:X y:Y) then TeleportedHead in
-                     if NumberShield > 0 then %Si NumberShield est supérier à 0
-                        NumberShield = NumberShield - 1 %On décrémente de 1 NumberShield
-                        %On skip l'effet
-                        NewSpaceship(positions:Positions effects:RestEffect strategy:Spaceship.strategy seismicCharge:Spaceship.seismicCharge)
-            
-                     else %Si NumberShield n'est pas plus grand que 0
-                        %On applique l'effet
-                        %il faut téléporter au point X, Y
-                        TeleportedHead = pos(x:X y:Y to:Direction) %TeleportedHead prend les coordonnées X Y passés en arguments
-                        NewPositions = TeleportedHead | RestTail %On lie les 2 dans une Queue
+
+               %EFFET WORMHOLE
+               []wormhole(x:X y:Y) then TeleportedHead in
+                  if NumberShield > 0 then %Si NumberShield est supérier à 0
+                     NumberShield = NumberShield - 1 %On décrémente de 1 NumberShield
+                     %On skip l'effet
+                     NewSpaceship(positions:Positions effects:RestEffect strategy:Spaceship.strategy seismicCharge:Spaceship.seismicCharge)
+         
+                  else %Si NumberShield n'est pas plus grand que 0
+                     %On applique l'effet
+                     %il faut téléporter au point X, Y
+                     TeleportedHead = pos(x:X y:Y to:Direction) %TeleportedHead prend les coordonnées X Y passés en arguments
+                     NewPositions = TeleportedHead | RestTail %On lie les 2 dans une Queue
+                     NewSpaceship(positions:NewPositions effects:RestEffect strategy:Spaceship.strategy seismicCharge:Spaceship.seismicCharge)
+         
+                  end
+               
+
+               %EFFET DROPSEISMICCHARGE
+               []dropSeismicCharge(L) then
+                  if NumberShield > 0 then %Si NumberShield est supérier à 0
+                     NumberShield = NumberShield - 1 %On décrémente de 1 NumberShield
+                     %On skip l'effet
+                     NewSpaceship(positions:Positions effects:RestEffect strategy:Spaceship.strategy seismicCharge:Spaceship.seismicCharge)
+         
+                  else %Si NumberShield n'est pas plus grand que 0
+                     %On applique l'effet
+                     if L == nil then %Si la liste L est vide
+                        {List.append Spaceship.seismicCharge true | nil} %On append avec List.append provenant de la documentation
                         NewSpaceship(positions:NewPositions effects:RestEffect strategy:Spaceship.strategy seismicCharge:Spaceship.seismicCharge)
-            
+                     else %Si L n'est pas vide on l'append à la liste Spaceship.SeismicCharge
+                        {List.append Spaceship.seismicCharge L} %On append avec List.append provenant de la documentation
+                        NewSpaceship(positions:NewPositions effects:RestEffect strategy:Spaceship.strategy seismicCharge:Spaceship.seismicCharge)
                      end
-                  
+         
+                  end
 
-                  %EFFET DROPSEISMICCHARGE
-                  []dropSeismicCharge(L) then
-                     if NumberShield > 0 then %Si NumberShield est supérier à 0
-                        NumberShield = NumberShield - 1 %On décrémente de 1 NumberShield
-                        %On skip l'effet
-                        NewSpaceship(positions:Positions effects:RestEffect strategy:Spaceship.strategy seismicCharge:Spaceship.seismicCharge)
-            
-                     else %Si NumberShield n'est pas plus grand que 0
-                        %On applique l'effet
-                        if L == nil then %Si la liste L est vide
-                           {List.append Spaceship.seismicCharge true | nil} %On append avec List.append provenant de la documentation
-                           NewSpaceship(positions:NewPositions effects:RestEffect strategy:Spaceship.strategy seismicCharge:Spaceship.seismicCharge)
-                        else %Si L n'est pas vide on l'append à la liste Spaceship.SeismicCharge
-                           {List.append Spaceship.seismicCharge L} %On append avec List.append provenant de la documentation
-                           NewSpaceship(positions:NewPositions effects:RestEffect strategy:Spaceship.strategy seismicCharge:Spaceship.seismicCharge)
-                        end
-            
+
+               %EFFET FROST
+               []frost(N) then NewEffect in
+                  if NumberShield > 0 then %Si NumberShield est supérier à 0
+                     NumberShield = NumberShield - 1 %On décrémente de 1 NumberShield
+                     %On skip l'effet
+                     NewSpaceship(positions:Positions effects:RestEffect strategy:Spaceship.strategy seismicCharge:Spaceship.seismicCharge)
+         
+                  else %Si NumberShield n'est pas plus grand que 0
+                     
+                     %On applique l'effet
+                     if N > 0 then % Vérifie si le nombre de tours de gel est supérieur à 0
+                        NewEffect = frost(N-1) | RestEffect % On réduit le nombre de tours restants de 1 et on conserve l'effet frost pour le tour suivant
+                     else
+                        NewEffect = RestEffect % Si le nombre de tours restants est de 0, on passe simplement à l'effet suivant
                      end
-
-
-                  %EFFET FROST
-                  []frost(N) then NewEffect in
-                     if NumberShield > 0 then %Si NumberShield est supérier à 0
-                        NumberShield = NumberShield - 1 %On décrémente de 1 NumberShield
-                        %On skip l'effet
-                        NewSpaceship(positions:Positions effects:RestEffect strategy:Spaceship.strategy seismicCharge:Spaceship.seismicCharge)
-            
-                     else %Si NumberShield n'est pas plus grand que 0
-                        
-                        %On applique l'effet
-                        if N > 0 then % Vérifie si le nombre de tours de gel est supérieur à 0
-                           NewEffect = frost(N-1) | RestEffect % On réduit le nombre de tours restants de 1 et on conserve l'effet frost pour le tour suivant
-                        else
-                           NewEffect = RestEffect % Si le nombre de tours restants est de 0, on passe simplement à l'effet suivant
-                        end
-            
-                        NewSpaceship(positions: Positions effects: NewEffect strategy: Spaceship.strategy seismicCharge: Spaceship.seismicCharge)
-            
-                     end
-
+         
+                     NewSpaceship(positions: Positions effects: NewEffect strategy: Spaceship.strategy seismicCharge: Spaceship.seismicCharge)
+         
+                  end
             end
          end
+
+
          %INSTRUCTION TURN(RIGHT)
          []turn(right) then NewHead NewPositions NewSpaceship ModifiedHead in %Si la direction est right
 
@@ -397,6 +407,7 @@ in
                NumberShield = N %On change la valeur de NumberShield par N
                NewSpaceship(positions:Positions effects:RestEffect strategy:Spaceship.strategy seismicCharge:Spaceship.seismicCharge)
 
+
                %EFFET SCRAP
                []scrap then NewTail in
                   if NumberShield > 0 then %Si NumberShield est supérier à 0
@@ -417,6 +428,7 @@ in
                      NewSpaceship(positions:NewPositions effects:RestEffect strategy:Spaceship.strategy seismicCharge:Spaceship.seismicCharge)
                   end
                
+
                %EFFET REVERT
                []revert then NewDirection ReverseList ToReverse in
                   if NumberShield > 0 then %Si NumberShield est supérier à 0
@@ -438,68 +450,66 @@ in
                      NewSpaceship(positions:ReverseList effects:RestEffect strategy:Spaceship.strategy seismicCharge:Spaceship.seismicCharge)
                   end
                
-                  %EFFET WORMHOLE
-                  []wormhole(x:X y:Y) then TeleportedHead in
-                     if NumberShield > 0 then %Si NumberShield est supérier à 0
-                        NumberShield = NumberShield - 1 %On décrémente de 1 NumberShield
-                        %On skip l'effet
-                        NewSpaceship(positions:Positions effects:RestEffect strategy:Spaceship.strategy seismicCharge:Spaceship.seismicCharge)
-            
-                     else %Si NumberShield n'est pas plus grand que 0
-                        %On applique l'effet
-                        %il faut téléporter au point X, Y
-                        TeleportedHead = pos(x:X y:Y to:Direction) %TeleportedHead prend les coordonnées X Y passés en arguments
-                        NewPositions = TeleportedHead | RestTail %On lie les 2 dans une Queue
+
+               %EFFET WORMHOLE
+               []wormhole(x:X y:Y) then TeleportedHead in
+                  if NumberShield > 0 then %Si NumberShield est supérier à 0
+                     NumberShield = NumberShield - 1 %On décrémente de 1 NumberShield
+                     %On skip l'effet
+                     NewSpaceship(positions:Positions effects:RestEffect strategy:Spaceship.strategy seismicCharge:Spaceship.seismicCharge)
+         
+                  else %Si NumberShield n'est pas plus grand que 0
+                     %On applique l'effet
+                     %il faut téléporter au point X, Y
+                     TeleportedHead = pos(x:X y:Y to:Direction) %TeleportedHead prend les coordonnées X Y passés en arguments
+                     NewPositions = TeleportedHead | RestTail %On lie les 2 dans une Queue
+                     NewSpaceship(positions:NewPositions effects:RestEffect strategy:Spaceship.strategy seismicCharge:Spaceship.seismicCharge)
+         
+                  end
+               
+
+               %EFFET DROPSEISMICCHARGE
+               []dropSeismicCharge(L) then
+                  if NumberShield > 0 then %Si NumberShield est supérier à 0
+                     NumberShield = NumberShield - 1 %On décrémente de 1 NumberShield
+                     %On skip l'effet
+                     NewSpaceship(positions:Positions effects:RestEffect strategy:Spaceship.strategy seismicCharge:Spaceship.seismicCharge)
+         
+                  else %Si NumberShield n'est pas plus grand que 0
+                     %On applique l'effet
+                     if L == nil then %Si la liste L est vide
+                        {List.append Spaceship.seismicCharge true | nil} %On append avec List.append provenant de la documentation
                         NewSpaceship(positions:NewPositions effects:RestEffect strategy:Spaceship.strategy seismicCharge:Spaceship.seismicCharge)
-            
+                     else %Si L n'est pas vide on l'append à la liste Spaceship.SeismicCharge
+                        {List.append Spaceship.seismicCharge L} %On append avec List.append provenant de la documentation
+                        NewSpaceship(positions:NewPositions effects:RestEffect strategy:Spaceship.strategy seismicCharge:Spaceship.seismicCharge)
                      end
-                  
-
-                  %EFFET DROPSEISMICCHARGE
-                  []dropSeismicCharge(L) then
-                     if NumberShield > 0 then %Si NumberShield est supérier à 0
-                        NumberShield = NumberShield - 1 %On décrémente de 1 NumberShield
-                        %On skip l'effet
-                        NewSpaceship(positions:Positions effects:RestEffect strategy:Spaceship.strategy seismicCharge:Spaceship.seismicCharge)
-            
-                     else %Si NumberShield n'est pas plus grand que 0
-                        %On applique l'effet
-                        if L == nil then %Si la liste L est vide
-                           {List.append Spaceship.seismicCharge true | nil} %On append avec List.append provenant de la documentation
-                           NewSpaceship(positions:NewPositions effects:RestEffect strategy:Spaceship.strategy seismicCharge:Spaceship.seismicCharge)
-                        else %Si L n'est pas vide on l'append à la liste Spaceship.SeismicCharge
-                           {List.append Spaceship.seismicCharge L} %On append avec List.append provenant de la documentation
-                           NewSpaceship(positions:NewPositions effects:RestEffect strategy:Spaceship.strategy seismicCharge:Spaceship.seismicCharge)
-                        end
-            
-                     end
-
-
-                  %EFFET FROST
-                  []frost(N) then NewEffect in
-                     if NumberShield > 0 then %Si NumberShield est supérier à 0
-                        NumberShield = NumberShield - 1 %On décrémente de 1 NumberShield
-                        %On skip l'effet
-                        NewSpaceship(positions:Positions effects:RestEffect strategy:Spaceship.strategy seismicCharge:Spaceship.seismicCharge)
-            
-                     else %Si NumberShield n'est pas plus grand que 0
-                        
-                        %On applique l'effet
-                        if N > 0 then % Vérifie si le nombre de tours de gel est supérieur à 0
-                           NewEffect = frost(N-1) | RestEffect % On réduit le nombre de tours restants de 1 et on conserve l'effet frost pour le tour suivant
-                        else
-                           NewEffect = RestEffect % Si le nombre de tours restants est de 0, on passe simplement à l'effet suivant
-                        end
-            
-                        NewSpaceship(positions: Positions effects: NewEffect strategy: Spaceship.strategy seismicCharge: Spaceship.seismicCharge)
-            
-                     end
+         
                   end
 
-            end
+
+               %EFFET FROST
+               []frost(N) then NewEffect in
+                  if NumberShield > 0 then %Si NumberShield est supérier à 0
+                     NumberShield = NumberShield - 1 %On décrémente de 1 NumberShield
+                     %On skip l'effet
+                     NewSpaceship(positions:Positions effects:RestEffect strategy:Spaceship.strategy seismicCharge:Spaceship.seismicCharge)
          
+                  else %Si NumberShield n'est pas plus grand que 0
+                     
+                     %On applique l'effet
+                     if N > 0 then % Vérifie si le nombre de tours de gel est supérieur à 0
+                        NewEffect = frost(N-1) | RestEffect % On réduit le nombre de tours restants de 1 et on conserve l'effet frost pour le tour suivant
+                     else
+                        NewEffect = RestEffect % Si le nombre de tours restants est de 0, on passe simplement à l'effet suivant
+                     end
+         
+                     NewSpaceship(positions: Positions effects: NewEffect strategy: Spaceship.strategy seismicCharge: Spaceship.seismicCharge)
+         
+                  end
+               end
+            end
          end
-      
       end
 
       
@@ -511,6 +521,7 @@ in
       %            | repeat(<strategy> times:<integer>) '|' <strategy>
       %            | nil
       fun {DecodeStrategy Strategy}
+         
          case Strategy of
          nil then nil %Si aucune instruction, retourne nil
          []Instruction|Rest then
